@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>行事曆</title>
+  <style>
+body {
+  font-family: "Microsoft JhengHei", sans-serif;
+}
+
+h1 {
+  
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+
+h2 {
+  margin-top: 5px;
+  margin-bottom: 5px;
+  font-size: 30px;
+  display: inline-block;
+}
+h3{
+  margin-top:0; 
+  text-align:center; 
+  font-size: 25px;
+}
+
+form {
+  
+  margin: 10px auto;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 20px;
+  box-sizing: border-box;
+}
+
+label {
+  display: block;
+  margin-top: 5px;
+  font-size: 20px;
+}
+
+input[type="text"],
+input[type="date"],
+input[type="time"],
+#editModal input {
+  width: 92%;
+      padding: 8px;
+      margin-top: 5px;
+      border-radius: 5px;
+      border: 1px solid #888;
+      font-size: 18px;
+     margin: 15px auto;
+}
+
+input[type="text"],
+input[type="date"],
+input[type="time"] {
+  border-radius: 15px;
+  font-size: 18px;
+}
+
+.btn {
+  margin-top: 15px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 15px;
+  color: white;
+  cursor: pointer;
+  font-size: 20px;
+}
+
+#addBtn {
+  background-color: #4a90e2;
+}
+#addBtn:hover {
+  background-color: #357abd;
+}
+
+#historyBtn {
+  background-color: #f39c12;
+  margin-left: 10px;
+}
+#historyBtn:hover {
+  background-color: #d35400;
+}
+
+table {
+  width: 100%;
+  margin: 20px auto;
+  border-collapse: collapse; /*  圓角設定 */
+  /* border-spacing: 0; */
+  display: none; /*按鈕控制顯示 */
+  box-sizing: border-box;
+  overflow: hidden;
+  border-radius: 20px;
+  border: 1px solid #aaa;
+}
+
+
+/* 表格卷軸 */
+.allTable-div{ 
+max-width: 100%;
+overflow-x: auto;
+white-space: nowrap;
+}
+
+.div-historyBtn{
+min-width: 30%;
+overflow-x: auto;
+white-space: nowrap;
+}
+
+th, td {
+  padding: 10px;
+  text-align: center;
+  font-size: 14px;
+}
+ /*表頭 */
+ th {  
+  background-color: #f2f2f2;
+}
+/*奇偶列背景色 */
+
+tbody tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+tbody tr:nth-child(odd) {
+  background-color: #ffffff;
+}
+
+
+
+/* 大框架div定位 */
+.div-b{
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  box-sizing: border-box;
+  padding: 0 20px; /* 可選，讓左右有點空白 */
+}
+
+/* Modal */
+#editModal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+}
+
+#editModal > div {
+  background: #fff;
+  width: 400px;
+  margin: 100px auto;
+  padding: 20px;
+  border-radius: 10px;
+  position: relative;
+  box-sizing: border-box;
+}
+
+#editModal button {
+  margin-top: 10px;
+  font-size: 16px;
+  padding: 8px 15px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+}
+
+#saveEditBtn {
+  background-color: #4a90e2;
+  color: white;
+}
+#saveEditBtn:hover {
+  background-color: #357abd;
+}
+
+#deleteEditBtn {
+  background-color: #f82a2a;
+  color: white;
+  margin-left: 10px;
+}
+#deleteEditBtn:hover {
+  background-color: #fb7373;
+}
+
+/* 取消按鈕 */
+ #closeEditModalBtn {
+      background:none;
+      border:none;
+      color:#555;
+      font-size:28px;
+      position:absolute;
+      top:10px;
+      left:10px;
+      cursor:pointer;
+      border-radius:50%;
+      padding:6px 12px;
+      transition: all 0.3s ease;
+    }
+    #closeEditModalBtn:hover {
+      background-color:#e74c3c; /* 紅色背景 */
+      color:white;
+      transform: scale(1.1);
+    }
+
+/* 表格按鈕 */
+.but-ans{
+   margin-top: 10px;
+  font-size: 16px;
+  padding: 8px 15px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  background-color: #61aaf3;
+  color: white;
+  
+
+}
+
+/* Modal */
+.close-btn {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: transparent;
+  border: none;
+  font-size: 30px;
+  color: #888;
+  cursor: pointer;
+}
+
+/* 瀏覽列 */
+.nav-1{
+  display: flex;  /* 水平排列內容 */
+  align-items: center; /* 垂直置中 */
+  padding: 0;                        /* 內距 */
+  position: sticky;                          /* 滾動時吸附上方 */
+  top: 0;                                     /* 吸附頂部 */
+  z-index: 500;                             /* 保證在其他元素之上 */
+  background-color: #f9f9f9;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+  font-size: 18px;
+}
+
+  </style>
+</head>
+<body>
+  <nav class="nav-1">
+  <h1 >行事曆</h1>
+  </nav>
+  <div class="div-b">
+    <h2>輸入</h2>
+    <form id="dataForm">
+      <label>日期</label>
+      <input type="date" id="date" placeholder="例如(例：2025-10-02)" />
+      <label>時間</label>
+      <input type="time" id="time" placeholder="例如：09:00" />
+      <label>行程提醒</label>
+      <input type="text" maxlength="25"  id="event" placeholder="限25字"/>
+      <label>備註</label>
+      <input type="text"  maxlength="25"  id="note" placeholder="限25字"/>
+      <button type="button" class="btn" id="addBtn">新增</button>
+      <button type="button" class="btn" id="historyBtn">檢視過往紀錄</button>
+    </form>
+  
+    <h2>即將到來的行程</h2>
+    <!-- 所有資料的表格 -->
+    <div class="allTable-div">
+      <table id="allTable">
+        <thead>
+          <tr>
+          <th>日期</th>
+          <th>時間</th>
+          <th>行程提醒</th>
+          <th>備註</th>
+          <th>操作</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 編輯用 Modal -->
+  <div id="editModal">
+    <div>
+      <button id="closeEditModalBtn" class="close-btn">&times;</button>
+
+      <h3>編輯行程</h3>
+      <form id="editForm">
+        <label>日期</label>
+        <input type="date" id="editDate" /><br />
+        <label>時間</label>
+        <input type="time" id="editTime" /><br />
+        <label>行程提醒</label>
+        <input type="text" id="editEvent" /><br />
+        <label>備註</label>
+        <input type="text" id="editNote" /><br />
+        <button type="button" id="saveEditBtn">儲存修改</button>
+        <button type="button" id="deleteEditBtn">刪除</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+
+    document.addEventListener("DOMContentLoaded", () => {
+      let records = JSON.parse(localStorage.getItem('calendarRecords') || '[]');
+      let currentEditIndex = null;
+
+      // 工具函數
+      function getNowDateTime() {
+        return new Date();
+      }
+      function parseDateTime(dateStr, timeStr) {
+        return new Date(`${dateStr}T${timeStr}`);
+      }
+      function saveToLocalStorage() {
+        localStorage.setItem('calendarRecords', JSON.stringify(records));
+      }
+
+      // 新增資料按鈕
+      document.getElementById("addBtn").addEventListener("click", () => {
+        const date = document.getElementById("date").value;
+        const time = document.getElementById("time").value;
+        const event = document.getElementById("event").value.trim();
+        const note = document.getElementById("note").value.trim();
+
+        if (!date || !time || !event) {
+          alert("請輸入完整資料！");
+          return;
+        }
+
+        records.push({ date, time, event, note });
+        saveToLocalStorage();
+        renderAllTable();
+
+        document.getElementById("dataForm").reset();
+       
+      });
+       // 關閉
+        document.getElementById("closeEditModalBtn").addEventListener("click", () => {
+        document.getElementById("editModal").style.display = "none";
+        });
+
+
+      // 渲染主表格（未來行程）
+      function renderAllTable() {
+        const tbody = document.querySelector("#allTable tbody");
+        tbody.innerHTML = "";
+
+        const now = getNowDateTime();
+
+        const upcomingRecords = records
+          .filter(record => parseDateTime(record.date, record.time) >= now)
+          .sort((a, b) => parseDateTime(a.date, a.time) - parseDateTime(b.date, b.time));
+
+        if (upcomingRecords.length > 0) {
+          document.getElementById("allTable").style.display = "table";
+        } else {
+          document.getElementById("allTable").style.display = "none";
+        }
+
+        upcomingRecords.forEach(record => {
+          const index = records.indexOf(record);
+          const row = tbody.insertRow();
+          row.innerHTML = `
+            <td>${record.date}</td>
+            <td>${record.time}</td>
+            <td>${record.event}</td>
+            <td>${record.note}</td>
+            <td><button  onclick="editRecord(${index})" class="but-ans">編輯</button></td>
+          `;
+        });
+      }
+
+      // 編輯功能
+      window.editRecord = function(index) {
+        currentEditIndex = index;
+        const record = records[index];
+
+        document.getElementById("editDate").value = record.date;
+        document.getElementById("editTime").value = record.time;
+        document.getElementById("editEvent").value = record.event;
+        document.getElementById("editNote").value = record.note;
+
+        document.getElementById("editModal").style.display = "block";
+      };
+
+      // 刪除編輯
+      document.getElementById("deleteEditBtn").addEventListener("click", () => {
+  if (confirm("確定要刪除這筆行程嗎？")) {
+    records.splice(currentEditIndex, 1);  // 刪除該筆資料
+    saveToLocalStorage();                 // 更新 localStorage
+    document.getElementById("editModal").style.display = "none";
+    renderAllTable();                     // 重繪表格
+  }
+});
+
+      
+
+      // 儲存編輯
+      document.getElementById("saveEditBtn").addEventListener("click", () => {
+        const updated = {
+          date: document.getElementById("editDate").value,
+          time: document.getElementById("editTime").value,
+          event: document.getElementById("editEvent").value.trim(),
+          note: document.getElementById("editNote").value.trim()
+        };
+
+        if (!updated.date || !updated.time || !updated.event) {
+          alert("請輸入完整資料！");
+          return;
+        }
+
+        records[currentEditIndex] = updated;
+        saveToLocalStorage();
+
+        document.getElementById("editModal").style.display = "none";
+        renderAllTable();
+      });
+
+      // 檢視過往紀錄
+      document.getElementById("historyBtn").addEventListener("click", () => {
+        const now = getNowDateTime();
+
+        const pastRecords = records
+          .filter(record => parseDateTime(record.date, record.time) < now)
+          .sort((a, b) => parseDateTime(b.date, b.time) - parseDateTime(a.date, a.time));
+
+        if (pastRecords.length === 0) {
+          alert("目前沒有過往紀錄！");
+          return;
+        }
+
+        // 建立 table HTML    新增div
+        let tableHTML = `
+  <div class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>日期</th>
+          <th>時間</th>
+          <th>行程提醒</th>
+          <th>備註</th>
+        </tr>
+      </thead>
+      <tbody>
+`;
+
+pastRecords.forEach(record => {
+  tableHTML += `
+    <tr>
+      <td>${record.date}</td>
+      <td>${record.time}</td>
+      <td>${record.event}</td>
+      <td>${record.note}</td>
+    </tr>
+  `;
+});
+
+tableHTML += `
+      </tbody>
+    </table>
+  </div>
+`;
+
+const popup = window.open("", "History Records", "width=375,height=667");
+popup.document.write(`
+  <html>
+    <head>
+      <title>過往紀錄</title>
+      <style>
+        .table-container {
+          max-width:100%;
+          // border: 1px solid #aaa;
+          overflow-x:auto;
+        }
+
+        table {
+          width: 100%;
+          border-collapse: collapse;
+          border-spacing: 0;
+          border: 1px solid #aaa;
+          border-radius: 20px;
+          overflow: hidden;
+          margin: 20px auto;
+        }
+
+        th, td {
+          // border: 1px solid #aaa;
+          padding: 10px;
+          text-align: center;
+          font-size: 14px;
+        }
+
+        th {
+          background-color: #f2f2f2;
+        }
+
+        tbody tr:nth-child(even) {
+          background-color: #f9f9f9;
+        }
+
+        tbody tr:nth-child(odd) {
+          background-color: #ffffff;
+        }
+
+        body {
+          font-family: Arial, sans-serif;
+          padding: 20px;
+        }
+
+        h2 {
+          margin: 0;
+        }
+      </style>
+    </head>
+    <body>
+      <h2>過往紀錄</h2>
+      ${tableHTML}
+    </body>
+  </html>
+`);
+        popup.document.close();
+      });
+
+      // 初始化頁面
+      renderAllTable();
+    });
+  </script>
+</body>
+
+<!-- 
+
+
+
+-->
+
+</html>
